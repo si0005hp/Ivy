@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/generated",
+                "${workspaceFolder}/antlr4/runtime/Cpp/runtime/src",
+                "${workspaceFolder}/antlr4/runtime/Cpp/runtime/src/misc",
+                "${workspaceFolder}/antlr4/runtime/Cpp/runtime/src/atn",
+                "${workspaceFolder}/antlr4/runtime/Cpp/runtime/src/dfa",
+                "${workspaceFolder}/antlr4/runtime/Cpp/runtime/src/tree",
+                "${workspaceFolder}/antlr4/runtime/Cpp/runtime/src/support"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}
