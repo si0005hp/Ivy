@@ -36,6 +36,7 @@ include_directories(
 
 set(antlr4-html_SRC 
   ${PROJECT_SOURCE_DIR}/main.cpp
+  ${PROJECT_SOURCE_DIR}/html.cpp
   ${antlr4-html-GENERATED_SRC}
 )
 

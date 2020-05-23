@@ -7,6 +7,8 @@
 #include "HTMLParserBaseVisitor.h"
 #include "HTMLParserBaseListener.h"
 
+#include "html.h"
+
 using namespace antlr4;
 
 int main(int argc, const char *argv[])
@@ -20,5 +22,9 @@ int main(int argc, const char *argv[])
 
   tree::ParseTree *tree = parser.htmlDocument();
   std::cout << tree->toStringTree(&parser) << std::endl;
+
+  HTMLVisitor v;
+  v.visit(tree);
+
   return 0;
 }
