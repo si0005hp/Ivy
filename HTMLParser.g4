@@ -9,16 +9,33 @@ htmlDocument
     ;
 
 htmlElement
-    : TAG_OPEN htmlTagName htmlAttribute* TAG_CLOSE htmlContent TAG_OPEN TAG_SLASH htmlTagName TAG_CLOSE
+    : TAG_OPEN htmlTagName htmlAttributes TAG_CLOSE htmlContent TAG_OPEN TAG_SLASH htmlTagName TAG_CLOSE
     ;
 
 htmlContent
-    : htmlChardata? (htmlElement htmlChardata?)*
+    : htmlElementOrText*
+    ;
+
+htmlElementOrText
+    : htmlElement
+    | htmlChardata
+    ;
+
+htmlAttributes
+    : htmlAttribute*
     ;
 
 htmlAttribute
+    : htmlKeyValueAttribute
+    | htmlBooleanAttribute
+    ;
+
+htmlKeyValueAttribute
     : htmlAttributeName TAG_EQUALS htmlAttributeValue
-    | htmlAttributeName
+    ;
+
+htmlBooleanAttribute
+    : htmlAttributeName
     ;
 
 htmlAttributeName

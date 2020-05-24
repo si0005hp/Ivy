@@ -3,3 +3,4 @@ generated/
 tmp/
 build/
 dist/
+.gdb_history
