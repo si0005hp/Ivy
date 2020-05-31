@@ -38,18 +38,14 @@ public:
 
 class HTMLVisitor : public HTMLParserBaseVisitor
 {
-  void visitHtmlAttribute(HTMLParser::HtmlAttributeContext *ctx, AttrMap &attrMap);
+  std::shared_ptr<Node> parseHtmlElement(HTMLParser::HtmlElementContext *ctx);
+  std::string parseHtmlTagName(HTMLParser::HtmlTagNameContext *ctx);
+  std::vector<std::shared_ptr<Node>> parseHtmlContent(HTMLParser::HtmlContentContext *ctx);
+  std::shared_ptr<Node> parseHtmlElementOrText(HTMLParser::HtmlElementOrTextContext *ctx);
+  AttrMap parseHtmlAttributes(HTMLParser::HtmlAttributesContext *ctx);
+  void parseHtmlAttribute(HTMLParser::HtmlAttributeContext *ctx, AttrMap &attrMap);
+  std::shared_ptr<Node> parseHtmlChardata(HTMLParser::HtmlChardataContext *ctx);
 
 public:
-  antlrcpp::Any visitHtmlDocument(HTMLParser::HtmlDocumentContext *ctx) override;
-  antlrcpp::Any visitHtmlElement(HTMLParser::HtmlElementContext *ctx) override;
-  antlrcpp::Any visitHtmlContent(HTMLParser::HtmlContentContext *ctx) override;
-  antlrcpp::Any visitHtmlElementOrText(HTMLParser::HtmlElementOrTextContext *ctx) override;
-  antlrcpp::Any visitHtmlAttributes(HTMLParser::HtmlAttributesContext *ctx) override;
-  antlrcpp::Any visitHtmlKeyValueAttribute(HTMLParser::HtmlKeyValueAttributeContext *ctx) override;
-  antlrcpp::Any visitHtmlBooleanAttribute(HTMLParser::HtmlBooleanAttributeContext *ctx) override;
-  antlrcpp::Any visitHtmlAttributeName(HTMLParser::HtmlAttributeNameContext *ctx) override;
-  antlrcpp::Any visitHtmlAttributeValue(HTMLParser::HtmlAttributeValueContext *ctx) override;
-  antlrcpp::Any visitHtmlTagName(HTMLParser::HtmlTagNameContext *ctx) override;
-  antlrcpp::Any visitHtmlChardata(HTMLParser::HtmlChardataContext *ctx) override;
+  std::shared_ptr<Node> parseHtml(HTMLParser::HtmlDocumentContext *ctx);
 };

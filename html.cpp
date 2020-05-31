@@ -5,7 +5,63 @@
 
 #include "html.h"
 
-void HTMLVisitor::visitHtmlAttribute(HTMLParser::HtmlAttributeContext *ctx, AttrMap &attrMap)
+std::shared_ptr<Node> HTMLVisitor::parseHtml(HTMLParser::HtmlDocumentContext *ctx)
+{
+  return parseHtmlElement(ctx->htmlElement());
+}
+
+std::shared_ptr<Node> HTMLVisitor::parseHtmlElement(HTMLParser::HtmlElementContext *ctx)
+{
+  auto tagName = parseHtmlTagName(ctx->htmlTagName().at(0));
+  auto map = parseHtmlAttributes(ctx->htmlAttributes());
+  auto children = parseHtmlContent(ctx->htmlContent());
+
+  return std::make_shared<ElementNode>(tagName, map, children);
+}
+
+std::string HTMLVisitor::parseHtmlTagName(HTMLParser::HtmlTagNameContext *ctx)
+{
+  return ctx->TAG_NAME()->getText();
+}
+
+std::vector<std::shared_ptr<Node>> HTMLVisitor::parseHtmlContent(HTMLParser::HtmlContentContext *ctx)
+{
+  std::vector<std::shared_ptr<Node>> nodes;
+
+  for (size_t i = 0; i < ctx->htmlElementOrText().size(); i++)
+  {
+    auto node = parseHtmlElementOrText(ctx->htmlElementOrText().at(i));
+    if (node != nullptr)
+    {
+      nodes.push_back(node);
+    }
+  }
+  return nodes;
+}
+
+std::shared_ptr<Node> HTMLVisitor::parseHtmlElementOrText(HTMLParser::HtmlElementOrTextContext *ctx)
+{
+  if (ctx->htmlElement() != nullptr)
+  {
+    return parseHtmlElement(ctx->htmlElement());
+  }
+  else if (ctx->htmlChardata() != nullptr)
+  {
+    return parseHtmlChardata(ctx->htmlChardata());
+  }
+}
+
+AttrMap HTMLVisitor::parseHtmlAttributes(HTMLParser::HtmlAttributesContext *ctx)
+{
+  AttrMap attrMap;
+  for (size_t i = 0; i < ctx->htmlAttribute().size(); i++)
+  {
+    parseHtmlAttribute(ctx->htmlAttribute().at(i), attrMap);
+  }
+  return attrMap;
+}
+
+void HTMLVisitor::parseHtmlAttribute(HTMLParser::HtmlAttributeContext *ctx, AttrMap &attrMap)
 {
   if (ctx->htmlKeyValueAttribute() != nullptr)
   {
@@ -19,85 +75,11 @@ void HTMLVisitor::visitHtmlAttribute(HTMLParser::HtmlAttributeContext *ctx, Attr
   }
 }
 
-antlrcpp::Any HTMLVisitor::visitHtmlDocument(HTMLParser::HtmlDocumentContext *ctx)
+std::shared_ptr<Node> HTMLVisitor::parseHtmlChardata(HTMLParser::HtmlChardataContext *ctx)
 {
-  return visitChildren(ctx);
-}
-
-antlrcpp::Any HTMLVisitor::visitHtmlElement(HTMLParser::HtmlElementContext *ctx)
-{
-  auto tagName = visitHtmlTagName(ctx->htmlTagName().at(0));
-  auto map = visitHtmlAttributes(ctx->htmlAttributes());
-  auto children = visitHtmlContent(ctx->htmlContent());
-
-  return std::make_shared<ElementNode>(ElementNode(tagName, map, children));
-}
-
-antlrcpp::Any HTMLVisitor::visitHtmlContent(HTMLParser::HtmlContentContext *ctx)
-{
-  std::vector<std::shared_ptr<Node>> nodes;
-
-  for (size_t i = 0; i < ctx->htmlElementOrText().size(); i++)
+  if (ctx->HTML_TEXT() == nullptr)
   {
-    auto node = visitHtmlElementOrText(ctx->htmlElementOrText().at(i));
-    nodes.push_back(node);
+    return nullptr;
   }
-  return nodes;
-}
-
-antlrcpp::Any HTMLVisitor::visitHtmlElementOrText(HTMLParser::HtmlElementOrTextContext *ctx)
-{
-  if (ctx->htmlElement() != nullptr)
-  {
-    return visitHtmlElement(ctx->htmlElement());
-  }
-  else if (ctx->htmlChardata() != nullptr)
-  {
-    return visitHtmlChardata(ctx->htmlChardata());
-  }
-}
-
-antlrcpp::Any HTMLVisitor::visitHtmlAttributes(HTMLParser::HtmlAttributesContext *ctx)
-{
-  AttrMap attrMap;
-  for (size_t i = 0; i < ctx->htmlAttribute().size(); i++)
-  {
-    visitHtmlAttribute(ctx->htmlAttribute().at(i), attrMap);
-  }
-  return attrMap;
-}
-
-antlrcpp::Any HTMLVisitor::visitHtmlKeyValueAttribute(HTMLParser::HtmlKeyValueAttributeContext *ctx)
-{
-  return visitChildren(ctx);
-}
-
-antlrcpp::Any HTMLVisitor::visitHtmlBooleanAttribute(HTMLParser::HtmlBooleanAttributeContext *ctx)
-{
-  return visitChildren(ctx);
-}
-
-antlrcpp::Any HTMLVisitor::visitHtmlAttributeName(HTMLParser::HtmlAttributeNameContext *ctx)
-{
-  return visitChildren(ctx);
-}
-
-antlrcpp::Any HTMLVisitor::visitHtmlAttributeValue(HTMLParser::HtmlAttributeValueContext *ctx)
-{
-  return visitChildren(ctx);
-}
-
-antlrcpp::Any HTMLVisitor::visitHtmlTagName(HTMLParser::HtmlTagNameContext *ctx)
-{
-  return ctx->TAG_NAME()->getText();
-}
-
-antlrcpp::Any HTMLVisitor::visitHtmlChardata(HTMLParser::HtmlChardataContext *ctx)
-{
-  if (ctx->HTML_TEXT() != nullptr)
-  {
-    // return std::make_shared<TextNode>(ctx->HTML_TEXT()->getText()); // TODO: Figure out why this fails
-    return std::static_pointer_cast<Node>(std::make_shared<TextNode>(ctx->HTML_TEXT()->getText()));
-  }
-  return nullptr;
+  return std::make_shared<TextNode>(ctx->HTML_TEXT()->getText());
 }

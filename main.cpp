@@ -20,11 +20,11 @@ int main(int argc, const char *argv[])
   CommonTokenStream tokens(&lexer);
   HTMLParser parser(&tokens);
 
-  tree::ParseTree *tree = parser.htmlDocument();
-  std::cout << tree->toStringTree(&parser) << std::endl;
+  HTMLParser::HtmlDocumentContext *html = parser.htmlDocument();
+  std::cout << html->toStringTree(&parser) << std::endl;
 
   HTMLVisitor v;
-  v.visit(tree);
+  v.parseHtml(html);
 
   return 0;
 }
