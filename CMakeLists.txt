@@ -15,15 +15,28 @@ set(antlr4-html-GENERATED_SRC
   ${PROJECT_SOURCE_DIR}/generated/HTMLParserListener.cpp
   ${PROJECT_SOURCE_DIR}/generated/HTMLParserVisitor.cpp
 )
+set(antlr4-css-GENERATED_SRC
+  ${PROJECT_SOURCE_DIR}/generated/CSSLexer.cpp
+  ${PROJECT_SOURCE_DIR}/generated/CSSParserBaseListener.cpp
+  ${PROJECT_SOURCE_DIR}/generated/CSSParserBaseVisitor.cpp
+  ${PROJECT_SOURCE_DIR}/generated/CSSParser.cpp
+  ${PROJECT_SOURCE_DIR}/generated/CSSParserListener.cpp
+  ${PROJECT_SOURCE_DIR}/generated/CSSParserVisitor.cpp
+)
 
-add_custom_target(GenerateParser DEPENDS ${antlr4-html-GENERATED_SRC})
-add_custom_command(OUTPUT ${antlr4-html-GENERATED_SRC}
+add_custom_target(GenerateParser DEPENDS ${antlr4-html-GENERATED_SRC} ${antlr4-css-GENERATED_SRC})
+add_custom_command(OUTPUT ${antlr4-html-GENERATED_SRC} ${antlr4-css-GENERATED_SRC}
   COMMAND 
   ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/generated/
   COMMAND
-  java -jar ${ANTLR_JAR_LOCATION} -Werror -Dlanguage=Cpp -listener -visitor -o ${PROJECT_SOURCE_DIR}/generated/ ${PROJECT_SOURCE_DIR}/HTMLLexer.g4 ${PROJECT_SOURCE_DIR}/HTMLParser.g4
+  java -jar ${ANTLR_JAR_LOCATION} -Werror -Dlanguage=Cpp -listener -visitor -o ${PROJECT_SOURCE_DIR}/generated/ 
+    ${PROJECT_SOURCE_DIR}/HTMLLexer.g4 ${PROJECT_SOURCE_DIR}/HTMLParser.g4
+    ${PROJECT_SOURCE_DIR}/CSSLexer.g4 ${PROJECT_SOURCE_DIR}/CSSParser.g4
+
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+
   DEPENDS ${PROJECT_SOURCE_DIR}/HTMLLexer.g4 ${PROJECT_SOURCE_DIR}/HTMLParser.g4
+          ${PROJECT_SOURCE_DIR}/CSSLexer.g4 ${PROJECT_SOURCE_DIR}/CSSParser.g4
 )
 
 include_directories(
@@ -36,12 +49,13 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/generated
 )
 
-set(antlr4-html_SRC 
+set(all_SRC
   ${PROJECT_SOURCE_DIR}/main.cpp
   ${PROJECT_SOURCE_DIR}/html.cpp
   ${antlr4-html-GENERATED_SRC}
+  ${antlr4-css-GENERATED_SRC}
 )
 
-add_executable(main ${antlr4-html_SRC})
+add_executable(main ${all_SRC})
 add_dependencies(main GenerateParser)
 target_link_libraries(main antlr4_static)

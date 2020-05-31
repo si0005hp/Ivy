@@ -1,0 +1,4 @@
+html,
+#root,
+.selected,
+html#btn.primary.secondary
