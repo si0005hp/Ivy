@@ -3,6 +3,8 @@ project(main)
 
 set(CMAKE_CXX_FLAGS "-g")
 
+find_package(Java COMPONENTS Runtime REQUIRED)
+
 set(antlr4-lib-cpp-dir ${PROJECT_SOURCE_DIR}/antlr4/runtime/Cpp)
 add_subdirectory(${antlr4-lib-cpp-dir} build)
 
@@ -29,7 +31,7 @@ add_custom_command(OUTPUT ${antlr4-html-GENERATED_SRC} ${antlr4-css-GENERATED_SR
   COMMAND 
   ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/generated/
   COMMAND
-  java -jar ${ANTLR_JAR_LOCATION} -Werror -Dlanguage=Cpp -listener -visitor -o ${PROJECT_SOURCE_DIR}/generated/ 
+  ${Java_JAVA_EXECUTABLE} -jar ${ANTLR_JAR_LOCATION} -Werror -Dlanguage=Cpp -listener -visitor -o ${PROJECT_SOURCE_DIR}/generated/ 
     ${PROJECT_SOURCE_DIR}/HTMLLexer.g4 ${PROJECT_SOURCE_DIR}/HTMLParser.g4
     ${PROJECT_SOURCE_DIR}/CSSLexer.g4 ${PROJECT_SOURCE_DIR}/CSSParser.g4
 
