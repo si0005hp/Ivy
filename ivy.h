@@ -55,8 +55,67 @@ public:
 
 /* css */
 
+class Value
+{
+};
+
+class Keyword : public Value
+{
+  std::string keyword;
+
+public:
+  Keyword(const std::string &keyword) : keyword(keyword) {}
+};
+
+class Declaration
+{
+  std::string property;
+  std::shared_ptr<Value> value;
+
+public:
+  Declaration(std::string property, std::shared_ptr<Value> value) : property(property), value(value) {}
+};
+
+class Selector
+{
+};
+
+class SimpleSelector : public Selector
+{
+  std::string tagName;
+  std::string id;
+  std::vector<std::string> classes;
+};
+
+class Rule
+{
+  std::vector<std::shared_ptr<Selector>> selectors;
+  std::vector<std::shared_ptr<Declaration>> declarations;
+
+public:
+  Rule(std::vector<std::shared_ptr<Selector>> selectors, std::vector<std::shared_ptr<Declaration>> declarations)
+      : selectors(selectors), declarations(declarations) {}
+};
+
+class Stylesheet
+{
+  std::vector<std::shared_ptr<Rule>> rules;
+
+public:
+  Stylesheet(std::vector<std::shared_ptr<Rule>> rules) : rules(rules) {}
+};
+
 class CSSVisitor : public CSSParserBaseVisitor
 {
+  std::shared_ptr<Rule> parseRuleSet(CSSParser::RuleSetContext *ctx);
+  std::vector<std::shared_ptr<Selector>> parseSelectorGroup(CSSParser::SelectorGroupContext *ctx);
+  std::shared_ptr<Selector> parseSimpleSelectorSequence(CSSParser::SimpleSelectorSequenceContext *ctx);
+  std::vector<std::shared_ptr<Declaration>> parseDeclarationList(CSSParser::DeclarationListContext *ctx);
+  std::shared_ptr<Declaration> parseDeclaration(CSSParser::DeclarationContext *ctx);
+  std::string parseProperty(CSSParser::PropertyContext *ctx);
+  std::shared_ptr<Value> parseValue(CSSParser::ValueContext *ctx);
+  std::shared_ptr<Value> parseKeyword(CSSParser::KeywordContext *ctx);
+
 public:
-  antlrcpp::Any parseCss(CSSParser::StylesheetContext *ctx);
+  std::shared_ptr<Stylesheet> parseCss(CSSParser::StylesheetContext *ctx);
 };
