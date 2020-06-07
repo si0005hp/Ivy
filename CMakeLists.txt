@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4)
 project(main)
 
-set(CMAKE_CXX_FLAGS "-g")
+set(CMAKE_CXX_FLAGS "-g -std=c++17 -Wall")
 
 find_package(Java COMPONENTS Runtime REQUIRED)
 
