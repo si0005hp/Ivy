@@ -54,6 +54,7 @@ include_directories(
 set(all_SRC
   ${PROJECT_SOURCE_DIR}/main.cpp
   ${PROJECT_SOURCE_DIR}/html.cpp
+  ${PROJECT_SOURCE_DIR}/css.cpp
   ${antlr4-html-GENERATED_SRC}
   ${antlr4-css-GENERATED_SRC}
 )

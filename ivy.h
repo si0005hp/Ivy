@@ -4,8 +4,11 @@
 #include <memory>
 
 #include "HTMLParserBaseVisitor.h"
+#include "CSSParserBaseVisitor.h"
 
 #pragma once
+
+/* html */
 
 using AttrMap = std::unordered_map<std::string, std::string>;
 
@@ -48,4 +51,12 @@ class HTMLVisitor : public HTMLParserBaseVisitor
 
 public:
   std::shared_ptr<Node> parseHtml(HTMLParser::HtmlDocumentContext *ctx);
+};
+
+/* css */
+
+class CSSVisitor : public CSSParserBaseVisitor
+{
+public:
+  antlrcpp::Any parseCss(CSSParser::StylesheetContext *ctx);
 };

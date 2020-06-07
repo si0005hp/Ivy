@@ -4,6 +4,8 @@
 #include "antlr4-runtime.h"
 #include "HTMLLexer.h"
 #include "HTMLParser.h"
+#include "CSSLexer.h"
+#include "CSSParser.h"
 
 #include "ivy.h"
 
@@ -25,10 +27,14 @@ int main(int argc, const char *argv[])
 {
   HTMLParser *htmlParser = generateParser<HTMLLexer, HTMLParser>(argv[1]);
   HTMLParser::HtmlDocumentContext *html = htmlParser->htmlDocument();
-  std::cout << html->toStringTree(htmlParser) << std::endl;
 
-  HTMLVisitor v;
-  v.parseHtml(html);
+  CSSParser *cssParser = generateParser<CSSLexer, CSSParser>(argv[2]);
+  CSSParser::StylesheetContext *css = cssParser->stylesheet();
 
+  HTMLVisitor htmlVisitor;
+  htmlVisitor.parseHtml(html);
+
+  CSSVisitor cssVisitor;
+  cssVisitor.parseCss(css);
   return 0;
 }
