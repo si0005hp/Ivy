@@ -71,7 +71,7 @@ void HTMLVisitor::parseHtmlAttribute(HTMLParser::HtmlAttributeContext *ctx, Attr
   }
   else if (ctx->htmlBooleanAttribute() != nullptr)
   {
-    // TODO
+    throw std::runtime_error("not inmplemented yet");
   }
 }
 

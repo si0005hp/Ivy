@@ -2,6 +2,7 @@
 #include <string>
 #include <unordered_map>
 #include <memory>
+#include <optional>
 
 #include "HTMLParserBaseVisitor.h"
 #include "CSSParserBaseVisitor.h"
@@ -67,6 +68,31 @@ public:
   Keyword(const std::string &keyword) : keyword(keyword) {}
 };
 
+enum class Unit
+{
+  Px
+};
+
+class Length : public Value
+{
+  float value;
+  Unit unit;
+
+public:
+  Length(float value, Unit unit) : value(value), unit(unit) {}
+};
+
+class Color : public Value
+{
+  uint8_t r;
+  uint8_t g;
+  uint8_t b;
+  uint8_t a;
+
+public:
+  Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) : r(r), g(g), b(b), a(a) {}
+};
+
 class Declaration
 {
   std::string property;
@@ -82,9 +108,13 @@ class Selector
 
 class SimpleSelector : public Selector
 {
-  std::string tagName;
-  std::string id;
+  std::optional<std::string> tagName;
+  std::optional<std::string> id;
   std::vector<std::string> classes;
+
+public:
+  SimpleSelector(std::optional<std::string> tagName, std::optional<std::string> id, std::vector<std::string> classes)
+      : tagName(tagName), id(id), classes(classes) {}
 };
 
 class Rule
@@ -110,11 +140,16 @@ class CSSVisitor : public CSSParserBaseVisitor
   std::shared_ptr<Rule> parseRuleSet(CSSParser::RuleSetContext *ctx);
   std::vector<std::shared_ptr<Selector>> parseSelectorGroup(CSSParser::SelectorGroupContext *ctx);
   std::shared_ptr<Selector> parseSimpleSelectorSequence(CSSParser::SimpleSelectorSequenceContext *ctx);
+  std::optional<std::string> parseElementName(CSSParser::ElementNameContext *ctx);
+  std::optional<std::string> parseId(CSSParser::IdContext *ctx);
+  std::string parseClassName(CSSParser::ClassNameContext *ctx);
   std::vector<std::shared_ptr<Declaration>> parseDeclarationList(CSSParser::DeclarationListContext *ctx);
   std::shared_ptr<Declaration> parseDeclaration(CSSParser::DeclarationContext *ctx);
   std::string parseProperty(CSSParser::PropertyContext *ctx);
   std::shared_ptr<Value> parseValue(CSSParser::ValueContext *ctx);
   std::shared_ptr<Value> parseKeyword(CSSParser::KeywordContext *ctx);
+  std::shared_ptr<Value> parseLength(CSSParser::LengthContext *ctx);
+  std::shared_ptr<Value> parseColor(CSSParser::ColorContext *ctx);
 
 public:
   std::shared_ptr<Stylesheet> parseCss(CSSParser::StylesheetContext *ctx);
