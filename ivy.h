@@ -227,3 +227,20 @@ class IvyCSSParser : public CSSParserBaseVisitor
 public:
   std::shared_ptr<Stylesheet> parseCSS(CSSParser::StylesheetContext *ctx);
 };
+
+/* style */
+
+using PropertyMap = std::unordered_map<std::string, Value>;
+
+class StyledNode
+{
+  std::shared_ptr<Node> node;
+  PropertyMap specifiedValues;
+  std::vector<std::shared_ptr<StyledNode>> children;
+};
+
+class StyledNodeBuilder
+{
+public:
+  std::shared_ptr<StyledNode> buildStyledNode(std::shared_ptr<ElementNode> htmlNode, std::shared_ptr<Stylesheet> stylesheet);
+};
