@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <algorithm>
 #include "CSSParserBaseVisitor.h"
 
 #include "ivy.h"
@@ -38,6 +39,11 @@ std::vector<std::shared_ptr<Selector>> CSSVisitor::parseSelectorGroup(CSSParser:
       selectors.push_back(selector);
     }
   }
+  // sort selectors by specificity
+  std::sort(selectors.begin(), selectors.end(),
+            [](std::shared_ptr<Selector> &s1, std::shared_ptr<Selector> &s2) {
+              return s1->specificity() > s2->specificity();
+            });
   return selectors;
 }
 

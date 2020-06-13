@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <memory>
 #include <optional>
+#include <tuple>
 
 #include "HTMLParserBaseVisitor.h"
 #include "CSSParserBaseVisitor.h"
@@ -102,8 +103,12 @@ public:
   Declaration(std::string property, std::shared_ptr<Value> value) : property(property), value(value) {}
 };
 
+using Specificity = std::tuple<size_t, size_t, size_t>;
+
 class Selector
 {
+public:
+  virtual Specificity specificity() = 0;
 };
 
 class SimpleSelector : public Selector
@@ -115,6 +120,14 @@ class SimpleSelector : public Selector
 public:
   SimpleSelector(std::optional<std::string> tagName, std::optional<std::string> id, std::vector<std::string> classes)
       : tagName(tagName), id(id), classes(classes) {}
+
+  Specificity specificity()
+  {
+    return std::make_tuple<size_t, size_t, size_t>(
+        id.has_value(),
+        classes.size(),
+        tagName.has_value());
+  }
 };
 
 class Rule
