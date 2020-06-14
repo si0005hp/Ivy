@@ -51,14 +51,24 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/generated
 )
 
-set(all_SRC
-  ${PROJECT_SOURCE_DIR}/main.cpp
+set(ivy_lib_SRC
   ${PROJECT_SOURCE_DIR}/html.cpp
   ${PROJECT_SOURCE_DIR}/css.cpp
   ${antlr4-html-GENERATED_SRC}
   ${antlr4-css-GENERATED_SRC}
 )
 
-add_executable(main ${all_SRC})
-add_dependencies(main GenerateParser)
-target_link_libraries(main antlr4_static)
+add_library(ivy_lib ${ivy_lib_SRC})
+add_dependencies(ivy_lib GenerateParser)
+target_link_libraries(ivy_lib antlr4_static)
+
+add_executable(ivy ${PROJECT_SOURCE_DIR}/main.cpp)
+target_link_libraries(ivy ivy_lib)
+
+# tests
+option(PACKAGE_TESTS "Build the tests" ON)
+if(PACKAGE_TESTS)
+  enable_testing()
+  include(GoogleTest)
+  add_subdirectory(tests)
+endif()
