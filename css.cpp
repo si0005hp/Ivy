@@ -2,7 +2,6 @@
 #include <string>
 #include <memory>
 #include <algorithm>
-#include "CSSParserBaseVisitor.h"
 
 #include "ivy.h"
 

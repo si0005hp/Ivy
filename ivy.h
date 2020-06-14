@@ -5,10 +5,30 @@
 #include <optional>
 #include <tuple>
 
+#include "antlr4-runtime.h"
+
 #include "HTMLParserBaseVisitor.h"
 #include "CSSParserBaseVisitor.h"
+#include "HTMLLexer.h"
+#include "HTMLParser.h"
+#include "CSSLexer.h"
+#include "CSSParser.h"
 
 #pragma once
+
+using namespace antlr4;
+
+template <typename L, typename P>
+P *generateAntlr4Parser(std::string fpath)
+{
+  std::ifstream stream;
+  stream.open(fpath);
+  ANTLRInputStream *input = new ANTLRInputStream(stream);
+  L *lexer = new L(input);
+  CommonTokenStream *tokens = new CommonTokenStream(lexer);
+  P *parser = new P(tokens);
+  return parser;
+}
 
 /* html */
 
