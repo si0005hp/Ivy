@@ -60,7 +60,7 @@ set(ivy_lib_SRC
 
 add_library(ivy_lib ${ivy_lib_SRC})
 add_dependencies(ivy_lib GenerateParser)
-target_link_libraries(ivy_lib antlr4_static)
+target_link_libraries(ivy_lib antlr4_static stdc++fs)
 
 add_executable(ivy ${PROJECT_SOURCE_DIR}/main.cpp)
 target_link_libraries(ivy ivy_lib)

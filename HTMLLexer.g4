@@ -36,6 +36,10 @@ TAG_NAME
     : Nondigit (Nondigit | Digit)*
     ;
 
+TAG_WHITESPACE
+    : [ \t\r\n] -> skip
+    ;
+
 fragment Nondigit
     : [a-zA-Z_]
     ;

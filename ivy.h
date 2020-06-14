@@ -34,13 +34,24 @@ P *generateAntlr4Parser(std::string fpath)
 
 using AttrMap = std::unordered_map<std::string, std::string>;
 
+enum class NodeType
+{
+  Element,
+  Text
+};
+
 class Node
 {
 protected:
+  NodeType type;
   std::vector<std::shared_ptr<Node>> children;
 
-  Node() {}
-  Node(const std::vector<std::shared_ptr<Node>> &children) : children(children) {}
+  Node(const NodeType &type) : type(type) {}
+  Node(const NodeType &type, const std::vector<std::shared_ptr<Node>> &children) : type(type), children(children) {}
+
+public:
+  NodeType getType() { return type; }
+  std::vector<std::shared_ptr<Node>> getChildren() { return children; }
 };
 
 class ElementNode : public Node
@@ -49,8 +60,11 @@ class ElementNode : public Node
   AttrMap attrMap;
 
 public:
-  ElementNode(const std::string &tagName, const AttrMap &attrMap, const std::vector<std::shared_ptr<Node>> &children)
-      : tagName(tagName), attrMap(attrMap), Node(children) {}
+  ElementNode(const NodeType &type, const std::string &tagName, const AttrMap &attrMap, const std::vector<std::shared_ptr<Node>> &children)
+      : tagName(tagName), attrMap(attrMap), Node(type, children) {}
+
+  std::string getTagName() { return tagName; }
+  AttrMap getAttrMap() { return attrMap; }
 };
 
 class TextNode : public Node
@@ -58,21 +72,25 @@ class TextNode : public Node
   std::string text;
 
 public:
-  TextNode(const std::string &text) : text(text) {}
+  TextNode(const NodeType &type, const std::string &text) : text(text), Node(type) {}
+
+  std::string getText() { return text; }
 };
 
 class HTMLVisitor : public HTMLParserBaseVisitor
 {
-  std::shared_ptr<Node> parseHtmlElement(HTMLParser::HtmlElementContext *ctx);
+  std::shared_ptr<ElementNode> parseHtmlElement(HTMLParser::HtmlElementContext *ctx);
   std::string parseHtmlTagName(HTMLParser::HtmlTagNameContext *ctx);
   std::vector<std::shared_ptr<Node>> parseHtmlContent(HTMLParser::HtmlContentContext *ctx);
   std::shared_ptr<Node> parseHtmlElementOrText(HTMLParser::HtmlElementOrTextContext *ctx);
   AttrMap parseHtmlAttributes(HTMLParser::HtmlAttributesContext *ctx);
   void parseHtmlAttribute(HTMLParser::HtmlAttributeContext *ctx, AttrMap &attrMap);
-  std::shared_ptr<Node> parseHtmlChardata(HTMLParser::HtmlChardataContext *ctx);
+  std::string parseHtmlAttributeName(HTMLParser::HtmlAttributeNameContext *ctx);
+  std::string parseHtmlAttributeValue(HTMLParser::HtmlAttributeValueContext *ctx);
+  std::shared_ptr<TextNode> parseHtmlChardata(HTMLParser::HtmlChardataContext *ctx);
 
 public:
-  std::shared_ptr<Node> parseHtml(HTMLParser::HtmlDocumentContext *ctx);
+  std::shared_ptr<ElementNode> parseHtml(HTMLParser::HtmlDocumentContext *ctx);
 };
 
 /* css */

@@ -4,18 +4,19 @@
 
 #include "ivy.h"
 
-std::shared_ptr<Node> HTMLVisitor::parseHtml(HTMLParser::HtmlDocumentContext *ctx)
+std::shared_ptr<ElementNode> HTMLVisitor::parseHtml(HTMLParser::HtmlDocumentContext *ctx)
 {
-  return parseHtmlElement(ctx->htmlElement());
+  std::shared_ptr<Node> root = parseHtmlElement(ctx->htmlElement());
+  return std::static_pointer_cast<ElementNode>(root); // root node should be ElementNode
 }
 
-std::shared_ptr<Node> HTMLVisitor::parseHtmlElement(HTMLParser::HtmlElementContext *ctx)
+std::shared_ptr<ElementNode> HTMLVisitor::parseHtmlElement(HTMLParser::HtmlElementContext *ctx)
 {
   auto tagName = parseHtmlTagName(ctx->htmlTagName().at(0));
   auto map = parseHtmlAttributes(ctx->htmlAttributes());
   auto children = parseHtmlContent(ctx->htmlContent());
 
-  return std::make_shared<ElementNode>(tagName, map, children);
+  return std::make_shared<ElementNode>(NodeType::Element, tagName, map, children);
 }
 
 std::string HTMLVisitor::parseHtmlTagName(HTMLParser::HtmlTagNameContext *ctx)
@@ -64,8 +65,8 @@ void HTMLVisitor::parseHtmlAttribute(HTMLParser::HtmlAttributeContext *ctx, Attr
 {
   if (ctx->htmlKeyValueAttribute() != nullptr)
   {
-    auto attrName = ctx->htmlKeyValueAttribute()->htmlAttributeName()->TAG_NAME()->getText();
-    auto attrValue = ctx->htmlKeyValueAttribute()->htmlAttributeValue()->ATTVALUE_VALUE()->getText();
+    auto attrName = parseHtmlAttributeName(ctx->htmlKeyValueAttribute()->htmlAttributeName());
+    auto attrValue = parseHtmlAttributeValue(ctx->htmlKeyValueAttribute()->htmlAttributeValue());
     attrMap[attrName] = attrValue;
   }
   else if (ctx->htmlBooleanAttribute() != nullptr)
@@ -74,11 +75,25 @@ void HTMLVisitor::parseHtmlAttribute(HTMLParser::HtmlAttributeContext *ctx, Attr
   }
 }
 
-std::shared_ptr<Node> HTMLVisitor::parseHtmlChardata(HTMLParser::HtmlChardataContext *ctx)
+std::string HTMLVisitor::parseHtmlAttributeName(HTMLParser::HtmlAttributeNameContext *ctx)
+{
+  return ctx->TAG_NAME()->getText();
+}
+
+std::string HTMLVisitor::parseHtmlAttributeValue(HTMLParser::HtmlAttributeValueContext *ctx)
+{
+  std::string value = ctx->ATTVALUE_VALUE()->getText();
+  // trim double quote
+  value.erase(value.begin());
+  value.erase(value.end() - 1);
+  return value;
+}
+
+std::shared_ptr<TextNode> HTMLVisitor::parseHtmlChardata(HTMLParser::HtmlChardataContext *ctx)
 {
   if (ctx->HTML_TEXT() == nullptr)
   {
     return nullptr;
   }
-  return std::make_shared<TextNode>(ctx->HTML_TEXT()->getText());
+  return std::make_shared<TextNode>(NodeType::Text, ctx->HTML_TEXT()->getText());
 }
