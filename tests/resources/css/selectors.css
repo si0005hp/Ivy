@@ -1,0 +1,16 @@
+.primary {
+  padding: 50px;
+}
+
+#root {
+  border-color: #cc0000;
+}
+
+.one,
+.two {
+  border-color: #abcdef;
+}
+
+hoge.fuga.foo#bar {
+  display: block;
+}

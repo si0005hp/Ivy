@@ -3,16 +3,9 @@
 #include <experimental/filesystem>
 
 #include "ivy.h"
+#include "test_util.h"
 
 using namespace antlr4;
-namespace fs = std::experimental::filesystem;
-
-char *testResourcesDir = std::getenv("TEST_RESOURCES_DIR");
-fs::path testResource(std::string file)
-{
-  fs::path dir = testResourcesDir ? testResourcesDir : "../tests/resources";
-  return dir.append("/").append(file);
-}
 
 std::shared_ptr<ElementNode> parseHtml(std::string file)
 {

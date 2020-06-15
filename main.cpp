@@ -15,6 +15,6 @@ int main(int argc, const char *argv[])
   htmlVisitor.parseHtml(html);
 
   CSSVisitor cssVisitor;
-  cssVisitor.parseCss(css);
+  cssVisitor.parseCSS(css);
   return 0;
 }

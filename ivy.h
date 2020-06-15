@@ -105,6 +105,8 @@ class Keyword : public Value
 
 public:
   Keyword(const std::string &keyword) : keyword(keyword) {}
+
+  std::string getKeyword() { return keyword; }
 };
 
 enum class Unit
@@ -119,6 +121,9 @@ class Length : public Value
 
 public:
   Length(float value, Unit unit) : value(value), unit(unit) {}
+
+  float getValue() { return value; }
+  Unit getUnit() { return unit; }
 };
 
 class Color : public Value
@@ -130,6 +135,11 @@ class Color : public Value
 
 public:
   Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) : r(r), g(g), b(b), a(a) {}
+
+  uint8_t getR() { return r; }
+  uint8_t getG() { return g; }
+  uint8_t getB() { return b; }
+  uint8_t getA() { return a; }
 };
 
 class Declaration
@@ -139,6 +149,9 @@ class Declaration
 
 public:
   Declaration(std::string property, std::shared_ptr<Value> value) : property(property), value(value) {}
+
+  std::string getProperty() { return property; }
+  std::shared_ptr<Value> getValue() { return value; }
 };
 
 using Specificity = std::tuple<size_t, size_t, size_t>;
@@ -159,6 +172,10 @@ public:
   SimpleSelector(std::optional<std::string> tagName, std::optional<std::string> id, std::vector<std::string> classes)
       : tagName(tagName), id(id), classes(classes) {}
 
+  std::optional<std::string> getTagName() { return tagName; }
+  std::optional<std::string> getId() { return id; }
+  std::vector<std::string> getClasses() { return classes; }
+
   Specificity specificity()
   {
     return std::make_tuple<size_t, size_t, size_t>(
@@ -176,6 +193,9 @@ class Rule
 public:
   Rule(std::vector<std::shared_ptr<Selector>> selectors, std::vector<std::shared_ptr<Declaration>> declarations)
       : selectors(selectors), declarations(declarations) {}
+
+  std::vector<std::shared_ptr<Selector>> getSelectors() { return selectors; }
+  std::vector<std::shared_ptr<Declaration>> getDeclarations() { return declarations; }
 };
 
 class Stylesheet
@@ -184,6 +204,8 @@ class Stylesheet
 
 public:
   Stylesheet(std::vector<std::shared_ptr<Rule>> rules) : rules(rules) {}
+
+  std::vector<std::shared_ptr<Rule>> getRules() { return rules; }
 };
 
 class CSSVisitor : public CSSParserBaseVisitor
@@ -203,5 +225,5 @@ class CSSVisitor : public CSSParserBaseVisitor
   std::shared_ptr<Value> parseColor(CSSParser::ColorContext *ctx);
 
 public:
-  std::shared_ptr<Stylesheet> parseCss(CSSParser::StylesheetContext *ctx);
+  std::shared_ptr<Stylesheet> parseCSS(CSSParser::StylesheetContext *ctx);
 };

@@ -5,7 +5,7 @@
 
 #include "ivy.h"
 
-std::shared_ptr<Stylesheet> CSSVisitor::parseCss(CSSParser::StylesheetContext *ctx)
+std::shared_ptr<Stylesheet> CSSVisitor::parseCSS(CSSParser::StylesheetContext *ctx)
 {
   std::vector<std::shared_ptr<Rule>> rules;
 
