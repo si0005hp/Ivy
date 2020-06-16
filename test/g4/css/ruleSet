@@ -1,7 +1,0 @@
-html {
-  width: 600px;
-  padding: 10px;
-  border-width: 1px;
-  margin: auto;
-  background: #ffffff;
-}
