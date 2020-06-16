@@ -5,7 +5,7 @@
 
 #include "ivy.h"
 
-std::shared_ptr<Stylesheet> CSSVisitor::parseCSS(CSSParser::StylesheetContext *ctx)
+std::shared_ptr<Stylesheet> IvyCSSParser::parseCSS(CSSParser::StylesheetContext *ctx)
 {
   std::vector<std::shared_ptr<Rule>> rules;
 
@@ -20,14 +20,14 @@ std::shared_ptr<Stylesheet> CSSVisitor::parseCSS(CSSParser::StylesheetContext *c
   return std::make_shared<Stylesheet>(rules);
 }
 
-std::shared_ptr<Rule> CSSVisitor::parseRuleSet(CSSParser::RuleSetContext *ctx)
+std::shared_ptr<Rule> IvyCSSParser::parseRuleSet(CSSParser::RuleSetContext *ctx)
 {
   auto declarations = parseDeclarationList(ctx->declarationList());
   auto selectors = parseSelectorGroup(ctx->selectorGroup());
   return std::make_shared<Rule>(selectors, declarations);
 }
 
-std::vector<std::shared_ptr<Selector>> CSSVisitor::parseSelectorGroup(CSSParser::SelectorGroupContext *ctx)
+std::vector<std::shared_ptr<Selector>> IvyCSSParser::parseSelectorGroup(CSSParser::SelectorGroupContext *ctx)
 {
   std::vector<std::shared_ptr<Selector>> selectors;
   for (size_t i = 0; i < ctx->simpleSelectorSequence().size(); i++)
@@ -46,7 +46,7 @@ std::vector<std::shared_ptr<Selector>> CSSVisitor::parseSelectorGroup(CSSParser:
   return selectors;
 }
 
-std::shared_ptr<Selector> CSSVisitor::parseSimpleSelectorSequence(CSSParser::SimpleSelectorSequenceContext *ctx)
+std::shared_ptr<Selector> IvyCSSParser::parseSimpleSelectorSequence(CSSParser::SimpleSelectorSequenceContext *ctx)
 {
   std::optional<std::string> tagName = parseElementName(ctx->elementName());
 
@@ -65,22 +65,22 @@ std::shared_ptr<Selector> CSSVisitor::parseSimpleSelectorSequence(CSSParser::Sim
   return std::make_shared<SimpleSelector>(tagName, id, classes);
 }
 
-std::optional<std::string> CSSVisitor::parseElementName(CSSParser::ElementNameContext *ctx)
+std::optional<std::string> IvyCSSParser::parseElementName(CSSParser::ElementNameContext *ctx)
 {
   return ctx == nullptr ? std::nullopt : std::optional<std::string>(ctx->IDENT()->getText());
 }
 
-std::optional<std::string> CSSVisitor::parseId(CSSParser::IdContext *ctx)
+std::optional<std::string> IvyCSSParser::parseId(CSSParser::IdContext *ctx)
 {
   return ctx == nullptr ? std::nullopt : std::optional<std::string>(ctx->IDENT()->getText());
 }
 
-std::string CSSVisitor::parseClassName(CSSParser::ClassNameContext *ctx)
+std::string IvyCSSParser::parseClassName(CSSParser::ClassNameContext *ctx)
 {
   return ctx->IDENT()->getText();
 }
 
-std::vector<std::shared_ptr<Declaration>> CSSVisitor::parseDeclarationList(CSSParser::DeclarationListContext *ctx)
+std::vector<std::shared_ptr<Declaration>> IvyCSSParser::parseDeclarationList(CSSParser::DeclarationListContext *ctx)
 {
   std::vector<std::shared_ptr<Declaration>> declarations;
   for (size_t i = 0; i < ctx->declaration().size(); i++)
@@ -94,19 +94,19 @@ std::vector<std::shared_ptr<Declaration>> CSSVisitor::parseDeclarationList(CSSPa
   return declarations;
 }
 
-std::shared_ptr<Declaration> CSSVisitor::parseDeclaration(CSSParser::DeclarationContext *ctx)
+std::shared_ptr<Declaration> IvyCSSParser::parseDeclaration(CSSParser::DeclarationContext *ctx)
 {
   auto property = parseProperty(ctx->property());
   auto value = parseValue(ctx->value());
   return std::make_shared<Declaration>(property, value);
 }
 
-std::string CSSVisitor::parseProperty(CSSParser::PropertyContext *ctx)
+std::string IvyCSSParser::parseProperty(CSSParser::PropertyContext *ctx)
 {
   return ctx->IDENT()->getText();
 }
 
-std::shared_ptr<Value> CSSVisitor::parseValue(CSSParser::ValueContext *ctx)
+std::shared_ptr<Value> IvyCSSParser::parseValue(CSSParser::ValueContext *ctx)
 {
   if (ctx->keyword() != nullptr)
   {
@@ -122,18 +122,18 @@ std::shared_ptr<Value> CSSVisitor::parseValue(CSSParser::ValueContext *ctx)
   }
 }
 
-std::shared_ptr<Value> CSSVisitor::parseKeyword(CSSParser::KeywordContext *ctx)
+std::shared_ptr<Value> IvyCSSParser::parseKeyword(CSSParser::KeywordContext *ctx)
 {
   return std::make_shared<Keyword>(ctx->IDENT()->getText());
 }
 
-std::shared_ptr<Value> CSSVisitor::parseLength(CSSParser::LengthContext *ctx)
+std::shared_ptr<Value> IvyCSSParser::parseLength(CSSParser::LengthContext *ctx)
 {
   auto value = std::stof(ctx->NUMBER()->getText());
   return std::make_shared<Length>(value, Unit::Px); // currently only support Px
 }
 
-std::shared_ptr<Value> CSSVisitor::parseColor(CSSParser::ColorContext *ctx)
+std::shared_ptr<Value> IvyCSSParser::parseColor(CSSParser::ColorContext *ctx)
 {
   std::string colorValueStr = ctx->colorValue()->getText();
   if (colorValueStr.length() != 6)

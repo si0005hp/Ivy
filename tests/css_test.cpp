@@ -1,6 +1,4 @@
 #include <gtest/gtest.h>
-#include <cstdlib>
-#include <experimental/filesystem>
 
 #include "ivy.h"
 #include "test_util.h"
@@ -12,8 +10,8 @@ std::shared_ptr<Stylesheet> parseCSS(std::string file)
   CSSParser *cssParser = generateAntlr4Parser<CSSLexer, CSSParser>(testResource(file));
   CSSParser::StylesheetContext *css = cssParser->stylesheet();
 
-  CSSVisitor cssVisitor;
-  return cssVisitor.parseCSS(css);
+  IvyCSSParser ivyCSSParser;
+  return ivyCSSParser.parseCSS(css);
 }
 
 TEST(css_parse_test, minimal)

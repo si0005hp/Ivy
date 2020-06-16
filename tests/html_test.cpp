@@ -1,6 +1,4 @@
 #include <gtest/gtest.h>
-#include <cstdlib>
-#include <experimental/filesystem>
 
 #include "ivy.h"
 #include "test_util.h"
@@ -12,8 +10,8 @@ std::shared_ptr<ElementNode> parseHtml(std::string file)
   HTMLParser *htmlParser = generateAntlr4Parser<HTMLLexer, HTMLParser>(testResource(file));
   HTMLParser::HtmlDocumentContext *html = htmlParser->htmlDocument();
 
-  HTMLVisitor htmlVisitor;
-  return htmlVisitor.parseHtml(html);
+  IvyHTMLParser ivyHtmlParser;
+  return ivyHtmlParser.parseHtml(html);
 }
 
 TEST(html_parse_test, minimal)

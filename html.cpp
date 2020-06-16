@@ -4,13 +4,13 @@
 
 #include "ivy.h"
 
-std::shared_ptr<ElementNode> HTMLVisitor::parseHtml(HTMLParser::HtmlDocumentContext *ctx)
+std::shared_ptr<ElementNode> IvyHTMLParser::parseHtml(HTMLParser::HtmlDocumentContext *ctx)
 {
   std::shared_ptr<Node> root = parseHtmlElement(ctx->htmlElement());
   return std::static_pointer_cast<ElementNode>(root); // root node should be ElementNode
 }
 
-std::shared_ptr<ElementNode> HTMLVisitor::parseHtmlElement(HTMLParser::HtmlElementContext *ctx)
+std::shared_ptr<ElementNode> IvyHTMLParser::parseHtmlElement(HTMLParser::HtmlElementContext *ctx)
 {
   auto tagName = parseHtmlTagName(ctx->htmlTagName().at(0));
   auto map = parseHtmlAttributes(ctx->htmlAttributes());
@@ -19,12 +19,12 @@ std::shared_ptr<ElementNode> HTMLVisitor::parseHtmlElement(HTMLParser::HtmlEleme
   return std::make_shared<ElementNode>(NodeType::Element, tagName, map, children);
 }
 
-std::string HTMLVisitor::parseHtmlTagName(HTMLParser::HtmlTagNameContext *ctx)
+std::string IvyHTMLParser::parseHtmlTagName(HTMLParser::HtmlTagNameContext *ctx)
 {
   return ctx->TAG_NAME()->getText();
 }
 
-std::vector<std::shared_ptr<Node>> HTMLVisitor::parseHtmlContent(HTMLParser::HtmlContentContext *ctx)
+std::vector<std::shared_ptr<Node>> IvyHTMLParser::parseHtmlContent(HTMLParser::HtmlContentContext *ctx)
 {
   std::vector<std::shared_ptr<Node>> nodes;
 
@@ -39,7 +39,7 @@ std::vector<std::shared_ptr<Node>> HTMLVisitor::parseHtmlContent(HTMLParser::Htm
   return nodes;
 }
 
-std::shared_ptr<Node> HTMLVisitor::parseHtmlElementOrText(HTMLParser::HtmlElementOrTextContext *ctx)
+std::shared_ptr<Node> IvyHTMLParser::parseHtmlElementOrText(HTMLParser::HtmlElementOrTextContext *ctx)
 {
   if (ctx->htmlElement() != nullptr)
   {
@@ -51,7 +51,7 @@ std::shared_ptr<Node> HTMLVisitor::parseHtmlElementOrText(HTMLParser::HtmlElemen
   }
 }
 
-AttrMap HTMLVisitor::parseHtmlAttributes(HTMLParser::HtmlAttributesContext *ctx)
+AttrMap IvyHTMLParser::parseHtmlAttributes(HTMLParser::HtmlAttributesContext *ctx)
 {
   AttrMap attrMap;
   for (size_t i = 0; i < ctx->htmlAttribute().size(); i++)
@@ -61,7 +61,7 @@ AttrMap HTMLVisitor::parseHtmlAttributes(HTMLParser::HtmlAttributesContext *ctx)
   return attrMap;
 }
 
-void HTMLVisitor::parseHtmlAttribute(HTMLParser::HtmlAttributeContext *ctx, AttrMap &attrMap)
+void IvyHTMLParser::parseHtmlAttribute(HTMLParser::HtmlAttributeContext *ctx, AttrMap &attrMap)
 {
   if (ctx->htmlKeyValueAttribute() != nullptr)
   {
@@ -75,12 +75,12 @@ void HTMLVisitor::parseHtmlAttribute(HTMLParser::HtmlAttributeContext *ctx, Attr
   }
 }
 
-std::string HTMLVisitor::parseHtmlAttributeName(HTMLParser::HtmlAttributeNameContext *ctx)
+std::string IvyHTMLParser::parseHtmlAttributeName(HTMLParser::HtmlAttributeNameContext *ctx)
 {
   return ctx->TAG_NAME()->getText();
 }
 
-std::string HTMLVisitor::parseHtmlAttributeValue(HTMLParser::HtmlAttributeValueContext *ctx)
+std::string IvyHTMLParser::parseHtmlAttributeValue(HTMLParser::HtmlAttributeValueContext *ctx)
 {
   std::string value = ctx->ATTVALUE_VALUE()->getText();
   // trim double quote
@@ -89,7 +89,7 @@ std::string HTMLVisitor::parseHtmlAttributeValue(HTMLParser::HtmlAttributeValueC
   return value;
 }
 
-std::shared_ptr<TextNode> HTMLVisitor::parseHtmlChardata(HTMLParser::HtmlChardataContext *ctx)
+std::shared_ptr<TextNode> IvyHTMLParser::parseHtmlChardata(HTMLParser::HtmlChardataContext *ctx)
 {
   if (ctx->HTML_TEXT() == nullptr)
   {

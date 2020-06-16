@@ -77,7 +77,7 @@ public:
   std::string getText() { return text; }
 };
 
-class HTMLVisitor : public HTMLParserBaseVisitor
+class IvyHTMLParser : public HTMLParserBaseVisitor
 {
   std::shared_ptr<ElementNode> parseHtmlElement(HTMLParser::HtmlElementContext *ctx);
   std::string parseHtmlTagName(HTMLParser::HtmlTagNameContext *ctx);
@@ -208,7 +208,7 @@ public:
   std::vector<std::shared_ptr<Rule>> getRules() { return rules; }
 };
 
-class CSSVisitor : public CSSParserBaseVisitor
+class IvyCSSParser : public CSSParserBaseVisitor
 {
   std::shared_ptr<Rule> parseRuleSet(CSSParser::RuleSetContext *ctx);
   std::vector<std::shared_ptr<Selector>> parseSelectorGroup(CSSParser::SelectorGroupContext *ctx);

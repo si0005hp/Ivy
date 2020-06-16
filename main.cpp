@@ -11,10 +11,10 @@ int main(int argc, const char *argv[])
   CSSParser *cssParser = generateAntlr4Parser<CSSLexer, CSSParser>(argv[2]);
   CSSParser::StylesheetContext *css = cssParser->stylesheet();
 
-  HTMLVisitor htmlVisitor;
-  htmlVisitor.parseHtml(html);
+  IvyHTMLParser ivyHtmlParser;
+  ivyHtmlParser.parseHtml(html);
 
-  CSSVisitor cssVisitor;
-  cssVisitor.parseCSS(css);
+  IvyCSSParser ivyCSSParser;
+  ivyCSSParser.parseCSS(css);
   return 0;
 }
