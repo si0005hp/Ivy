@@ -38,7 +38,7 @@ std::vector<std::shared_ptr<Selector>> IvyCSSParser::parseSelectorGroup(CSSParse
       selectors.push_back(selector);
     }
   }
-  // sort selectors by specificity
+  // sort selectors by specificity as highest to lowest.
   std::sort(selectors.begin(), selectors.end(),
             [](std::shared_ptr<Selector> &s1, std::shared_ptr<Selector> &s2) {
               return s1->specificity() > s2->specificity();
@@ -145,4 +145,27 @@ std::shared_ptr<Value> IvyCSSParser::parseColor(CSSParser::ColorContext *ctx)
   uint8_t g = std::stoi(colorValueStr.substr(2, 2), nullptr, 16);
   uint8_t b = std::stoi(colorValueStr.substr(4, 2), nullptr, 16);
   return std::make_shared<Color>(r, g, b, 255);
+}
+
+Specificity SimpleSelector::specificity()
+{
+  return std::make_tuple(id.has_value(), classes.size(), tagName.has_value());
+}
+
+bool SimpleSelector::matches(std::shared_ptr<ElementNode> elem)
+{
+  if (tagName.value() != elem->getTagName())
+  {
+    return false;
+  }
+  if (id != elem->id())
+  {
+    return false;
+  }
+  if (std::any_of(classes.begin(), classes.end(), [&](std::string clazz) { return elem->classes().count(clazz) <= 0; }))
+  {
+    return false;
+  }
+
+  return true;
 }

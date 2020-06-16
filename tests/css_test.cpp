@@ -3,17 +3,6 @@
 #include "ivy.h"
 #include "test_util.h"
 
-using namespace antlr4;
-
-std::shared_ptr<Stylesheet> parseCSS(std::string file)
-{
-  CSSParser *cssParser = generateAntlr4Parser<CSSLexer, CSSParser>(testResource(file));
-  CSSParser::StylesheetContext *css = cssParser->stylesheet();
-
-  IvyCSSParser ivyCSSParser;
-  return ivyCSSParser.parseCSS(css);
-}
-
 TEST(css_parse_test, minimal)
 {
   std::shared_ptr<Stylesheet> stylesheet = parseCSS("css/minimal.css");
@@ -81,7 +70,7 @@ TEST(css_parse_test, selectors)
   std::vector<std::shared_ptr<Selector>> selectors4 = stylesheet->getRules().at(3)->getSelectors();
   ASSERT_EQ(selectors4.size(), 1);
   std::shared_ptr<SimpleSelector> miscSelector = std::static_pointer_cast<SimpleSelector>(selectors4.at(0));
-  ASSERT_EQ(miscSelector->getTagName(), "hoge");
+  ASSERT_EQ(miscSelector->getTagName(), "div");
   ASSERT_EQ(miscSelector->getClasses().size(), 2);
   ASSERT_EQ(miscSelector->getClasses().at(0), "fuga");
   ASSERT_EQ(miscSelector->getClasses().at(1), "foo");

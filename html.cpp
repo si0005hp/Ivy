@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <sstream>
+#include <unordered_set>
 
 #include "ivy.h"
 
@@ -67,7 +69,7 @@ void IvyHTMLParser::parseHtmlAttribute(HTMLParser::HtmlAttributeContext *ctx, At
   {
     auto attrName = parseHtmlAttributeName(ctx->htmlKeyValueAttribute()->htmlAttributeName());
     auto attrValue = parseHtmlAttributeValue(ctx->htmlKeyValueAttribute()->htmlAttributeValue());
-    attrMap[attrName] = attrValue;
+    attrMap.emplace(attrName, attrValue);
   }
   else if (ctx->htmlBooleanAttribute() != nullptr)
   {
@@ -96,4 +98,24 @@ std::shared_ptr<TextNode> IvyHTMLParser::parseHtmlChardata(HTMLParser::HtmlChard
     return nullptr;
   }
   return std::make_shared<TextNode>(NodeType::Text, ctx->HTML_TEXT()->getText());
+}
+
+std::optional<std::string> ElementNode::id()
+{
+  return attrMap.count("id") > 0 ? std::make_optional(attrMap["id"]) : std::nullopt;
+}
+
+std::unordered_set<std::string> ElementNode::classes()
+{
+  std::unordered_set<std::string> classes;
+  std::stringstream ss(attrMap["class"]);
+  std::string item;
+  while (getline(ss, item, ' '))
+  {
+    if (!item.empty())
+    {
+      classes.insert(item);
+    }
+  }
+  return classes;
 }

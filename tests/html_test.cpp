@@ -3,17 +3,6 @@
 #include "ivy.h"
 #include "test_util.h"
 
-using namespace antlr4;
-
-std::shared_ptr<ElementNode> parseHtml(std::string file)
-{
-  HTMLParser *htmlParser = generateAntlr4Parser<HTMLLexer, HTMLParser>(testResource(file));
-  HTMLParser::HtmlDocumentContext *html = htmlParser->htmlDocument();
-
-  IvyHTMLParser ivyHtmlParser;
-  return ivyHtmlParser.parseHtml(html);
-}
-
 TEST(html_parse_test, minimal)
 {
   std::shared_ptr<ElementNode> root = parseHtml("html/minimal.html");
@@ -53,9 +42,24 @@ TEST(html_parse_test, attributes)
   std::shared_ptr<ElementNode> button1 = std::static_pointer_cast<ElementNode>(root->getChildren().at(0));
   ASSERT_EQ(button1->getAttrMap().size(), 2);
   ASSERT_EQ(button1->getAttrMap()["id"], "1");
-  ASSERT_EQ(button1->getAttrMap()["class"], "primary");
+  ASSERT_EQ(button1->getAttrMap()["class"], "primary btn btn");
 
   std::shared_ptr<ElementNode> button2 = std::static_pointer_cast<ElementNode>(root->getChildren().at(1));
   ASSERT_EQ(button2->getAttrMap().size(), 1);
   ASSERT_EQ(button2->getAttrMap()["id"], "2");
+}
+
+TEST(html_elem_test, accessors)
+{
+  std::shared_ptr<ElementNode> root = parseHtml("html/attributes.html");
+
+  std::shared_ptr<ElementNode> button1 = std::static_pointer_cast<ElementNode>(root->getChildren().at(0));
+  ASSERT_EQ(button1->id().value(), "1");
+  ASSERT_EQ(button1->classes().size(), 2);
+  ASSERT_EQ(button1->classes().count("primary"), 1);
+  ASSERT_EQ(button1->classes().count("btn"), 1);
+
+  std::shared_ptr<ElementNode> button2 = std::static_pointer_cast<ElementNode>(root->getChildren().at(1));
+  ASSERT_EQ(button2->id().value(), "2");
+  ASSERT_EQ(button2->classes().size(), 0);
 }

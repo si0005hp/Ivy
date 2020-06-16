@@ -65,6 +65,9 @@ public:
 
   std::string getTagName() { return tagName; }
   AttrMap getAttrMap() { return attrMap; }
+
+  std::optional<std::string> id();
+  std::unordered_set<std::string> classes();
 };
 
 class TextNode : public Node
@@ -160,6 +163,7 @@ class Selector
 {
 public:
   virtual Specificity specificity() = 0;
+  virtual bool matches(std::shared_ptr<ElementNode> elem) = 0;
 };
 
 class SimpleSelector : public Selector
@@ -176,13 +180,8 @@ public:
   std::optional<std::string> getId() { return id; }
   std::vector<std::string> getClasses() { return classes; }
 
-  Specificity specificity()
-  {
-    return std::make_tuple<size_t, size_t, size_t>(
-        id.has_value(),
-        classes.size(),
-        tagName.has_value());
-  }
+  Specificity specificity();
+  bool matches(std::shared_ptr<ElementNode> elem);
 };
 
 class Rule
@@ -230,17 +229,27 @@ public:
 
 /* style */
 
-using PropertyMap = std::unordered_map<std::string, Value>;
+using PropertyMap = std::unordered_map<std::string, std::shared_ptr<Value>>;
 
 class StyledNode
 {
   std::shared_ptr<Node> node;
   PropertyMap specifiedValues;
   std::vector<std::shared_ptr<StyledNode>> children;
+
+public:
+  StyledNode(std::shared_ptr<Node> node, PropertyMap specifiedValues, std::vector<std::shared_ptr<StyledNode>> children)
+      : node(node), specifiedValues(specifiedValues), children(children) {}
 };
+
+using MatchedRule = std::tuple<Specificity, std::shared_ptr<Rule>>;
 
 class StyledNodeBuilder
 {
+  PropertyMap specifiedValues(std::shared_ptr<Node> node, std::shared_ptr<Stylesheet> stylesheet);
+  std::vector<MatchedRule> matchingRules(std::shared_ptr<ElementNode> elem, std::shared_ptr<Stylesheet> stylesheet);
+  std::optional<MatchedRule> matchRule(std::shared_ptr<ElementNode> elem, std::shared_ptr<Rule> rule);
+
 public:
-  std::shared_ptr<StyledNode> buildStyledNode(std::shared_ptr<ElementNode> htmlNode, std::shared_ptr<Stylesheet> stylesheet);
+  std::shared_ptr<StyledNode> buildStyledNode(std::shared_ptr<Node> htmlNode, std::shared_ptr<Stylesheet> stylesheet);
 };
