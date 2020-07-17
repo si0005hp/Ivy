@@ -154,11 +154,11 @@ Specificity SimpleSelector::specificity()
 
 bool SimpleSelector::matches(std::shared_ptr<ElementNode> elem)
 {
-  if (tagName.value() != elem->getTagName())
+  if (tagName.has_value() && tagName.value() != elem->getTagName())
   {
     return false;
   }
-  if (id != elem->id())
+  if (id.has_value() && id != elem->id())
   {
     return false;
   }

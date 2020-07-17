@@ -240,6 +240,10 @@ class StyledNode
 public:
   StyledNode(std::shared_ptr<Node> node, PropertyMap specifiedValues, std::vector<std::shared_ptr<StyledNode>> children)
       : node(node), specifiedValues(specifiedValues), children(children) {}
+
+  std::shared_ptr<Node> getNode() { return node; }
+  PropertyMap getSpecifiedValues() { return specifiedValues; }
+  std::vector<std::shared_ptr<StyledNode>> getChildren() { return children; }
 };
 
 using MatchedRule = std::tuple<Specificity, std::shared_ptr<Rule>>;

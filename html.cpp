@@ -69,7 +69,7 @@ void IvyHTMLParser::parseHtmlAttribute(HTMLParser::HtmlAttributeContext *ctx, At
   {
     auto attrName = parseHtmlAttributeName(ctx->htmlKeyValueAttribute()->htmlAttributeName());
     auto attrValue = parseHtmlAttributeValue(ctx->htmlKeyValueAttribute()->htmlAttributeValue());
-    attrMap.emplace(attrName, attrValue);
+    attrMap[attrName] = attrValue;
   }
   else if (ctx->htmlBooleanAttribute() != nullptr)
   {

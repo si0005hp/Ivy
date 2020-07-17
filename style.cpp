@@ -37,7 +37,7 @@ PropertyMap StyledNodeBuilder::specifiedValues(std::shared_ptr<Node> node, std::
     for (size_t i = 0; i < rule->getDeclarations().size(); i++)
     {
       std::shared_ptr<Declaration> decl = rule->getDeclarations().at(i);
-      specifiedValues.emplace(decl->getProperty(), decl->getValue());
+      specifiedValues[decl->getProperty()] = decl->getValue();
     }
   }
   return specifiedValues;
