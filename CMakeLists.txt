@@ -55,6 +55,7 @@ set(ivy_lib_SRC
   ${PROJECT_SOURCE_DIR}/html.cpp
   ${PROJECT_SOURCE_DIR}/css.cpp
   ${PROJECT_SOURCE_DIR}/style.cpp
+  ${PROJECT_SOURCE_DIR}/layout.cpp
   ${antlr4-html-GENERATED_SRC}
   ${antlr4-css-GENERATED_SRC}
 )

@@ -23,5 +23,6 @@ package_add_test(ivy_test
   html_test.cpp
   css_test.cpp
   style_test.cpp
+  layout_test.cpp
   test_util.cpp
 )

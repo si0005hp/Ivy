@@ -69,3 +69,33 @@ std::optional<MatchedRule> StyledNodeBuilder::matchRule(std::shared_ptr<ElementN
   }
   return std::nullopt;
 }
+
+std::optional<std::shared_ptr<Value>> StyledNode::value(std::string key)
+{
+  return specifiedValues.count(key) > 0 ? std::make_optional(specifiedValues[key]) : std::nullopt;
+}
+
+Display StyledNode::display()
+{
+  auto displayOpt = value("display");
+  if (!displayOpt.has_value())
+  {
+    return Display::Inline; // inline as default
+  }
+
+  auto display = std::static_pointer_cast<Keyword>(displayOpt.value())->getKeyword();
+  if (display == "block")
+  {
+    return Display::Block;
+  }
+  else if (display == "none")
+  {
+    return Display::None;
+  }
+  return Display::Inline;
+}
+
+std::shared_ptr<Value> StyledNode::lookup(std::string key, std::string fallbackKey, std::shared_ptr<Value> defval)
+{
+  return value(key).value_or(value(fallbackKey).value_or(defval));
+}

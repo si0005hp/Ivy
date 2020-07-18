@@ -136,10 +136,7 @@ std::shared_ptr<Value> IvyCSSParser::parseLength(CSSParser::LengthContext *ctx)
 std::shared_ptr<Value> IvyCSSParser::parseColor(CSSParser::ColorContext *ctx)
 {
   std::string colorValueStr = ctx->colorValue()->getText();
-  if (colorValueStr.length() != 6)
-  {
-    throw std::runtime_error("color value must be 6-digit hexadecimal number");
-  }
+  ASSERT(colorValueStr.length() == 6, "color value must be 6-digit hexadecimal number");
 
   uint8_t r = std::stoi(colorValueStr.substr(0, 2), nullptr, 16);
   uint8_t g = std::stoi(colorValueStr.substr(2, 2), nullptr, 16);
@@ -168,4 +165,12 @@ bool SimpleSelector::matches(std::shared_ptr<ElementNode> elem)
   }
 
   return true;
+}
+
+float Value::toPx()
+{
+  if (typeid(*this) != typeid(Length))
+    return 0;
+
+  return (static_cast<Length &>(*this)).getValue();
 }

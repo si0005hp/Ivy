@@ -16,6 +16,12 @@
 
 #pragma once
 
+#if !defined(ASSERT)
+#define ASSERT(cond, errMsg) \
+  if (!(cond))               \
+    throw std::runtime_error(errMsg);
+#endif
+
 using namespace antlr4;
 
 template <typename L, typename P>
@@ -100,6 +106,10 @@ public:
 
 class Value
 {
+public:
+  virtual bool operator==(const Value &other) const { throw std::runtime_error("Value#operator== is not supposed to be called."); }
+
+  float toPx();
 };
 
 class Keyword : public Value
@@ -108,6 +118,15 @@ class Keyword : public Value
 
 public:
   Keyword(const std::string &keyword) : keyword(keyword) {}
+
+  bool operator==(const Value &other) const override
+  {
+    if (typeid(*this) != typeid(other))
+      return false;
+
+    Keyword o = static_cast<const Keyword &>(other);
+    return keyword == o.keyword;
+  }
 
   std::string getKeyword() { return keyword; }
 };
@@ -125,6 +144,15 @@ class Length : public Value
 public:
   Length(float value, Unit unit) : value(value), unit(unit) {}
 
+  bool operator==(const Value &other) const override
+  {
+    if (typeid(*this) != typeid(other))
+      return false;
+
+    Length o = static_cast<const Length &>(other);
+    return value == o.value && unit == o.unit;
+  }
+
   float getValue() { return value; }
   Unit getUnit() { return unit; }
 };
@@ -138,6 +166,15 @@ class Color : public Value
 
 public:
   Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) : r(r), g(g), b(b), a(a) {}
+
+  bool operator==(const Value &other) const override
+  {
+    if (typeid(*this) != typeid(other))
+      return false;
+
+    Color o = static_cast<const Color &>(other);
+    return r == o.r && g == o.g && b == o.b && a == o.a;
+  }
 
   uint8_t getR() { return r; }
   uint8_t getG() { return g; }
@@ -229,6 +266,13 @@ public:
 
 /* style */
 
+enum class Display
+{
+  Block,
+  Inline,
+  None,
+};
+
 using PropertyMap = std::unordered_map<std::string, std::shared_ptr<Value>>;
 
 class StyledNode
@@ -244,6 +288,10 @@ public:
   std::shared_ptr<Node> getNode() { return node; }
   PropertyMap getSpecifiedValues() { return specifiedValues; }
   std::vector<std::shared_ptr<StyledNode>> getChildren() { return children; }
+
+  std::optional<std::shared_ptr<Value>> value(std::string key);
+  Display display();
+  std::shared_ptr<Value> lookup(std::string key, std::string fallbackKey, std::shared_ptr<Value> defval);
 };
 
 using MatchedRule = std::tuple<Specificity, std::shared_ptr<Rule>>;
@@ -256,4 +304,102 @@ class StyledNodeBuilder
 
 public:
   std::shared_ptr<StyledNode> buildStyledNode(std::shared_ptr<Node> htmlNode, std::shared_ptr<Stylesheet> stylesheet);
+};
+
+/* layout */
+
+struct EdgeSizes
+{
+  float left;
+  float right;
+  float top;
+  float bottom;
+};
+
+struct Rect
+{
+  float x;
+  float y;
+  float width;
+  float height;
+
+  Rect() {}
+  Rect(float x, float y, float width, float height) : x(x), y(y), width(width), height(height) {}
+
+  const Rect &expandedBy(const EdgeSizes &edge) const;
+};
+
+struct Dimensions
+{
+  Rect content;
+  EdgeSizes padding;
+  EdgeSizes border;
+  EdgeSizes margin;
+
+  const Rect &paddingBox() const;
+  const Rect &borderBox() const;
+  const Rect &margingBox() const;
+};
+
+enum class BoxType
+{
+  Block,
+  Inline,
+  AnonymousBlock,
+};
+
+class LayoutBox
+{
+protected:
+  Dimensions dimensions;
+  BoxType type;
+  std::shared_ptr<StyledNode> styledNode;
+  std::vector<std::shared_ptr<LayoutBox>> children;
+
+public:
+  LayoutBox(BoxType type) : type(type) {}
+  LayoutBox(BoxType type, std::shared_ptr<StyledNode> styledNode) : type(type), styledNode(styledNode) {}
+
+  const Dimensions &getDimensions() const { return dimensions; }
+  BoxType getType() { return type; }
+  std::vector<std::shared_ptr<LayoutBox>> getChildren() { return children; }
+
+  std::shared_ptr<LayoutBox> getInlineContainer();
+  virtual void layout(const Dimensions &containingBlock) { throw std::runtime_error("LayoutBox#layout is not supposed to be called."); }
+};
+
+class BlockNode : public LayoutBox
+{
+  void calculateBlockWidth(const Dimensions &containingBlock);
+  void calculateBlockPosition(const Dimensions &containingBlock);
+  void layoutBlockChildren();
+  void calculateBlockHeight();
+
+public:
+  BlockNode(std::shared_ptr<StyledNode> styledNode) : LayoutBox(BoxType::Block, styledNode) {}
+
+  void layout(const Dimensions &containingBlock) override;
+};
+
+class InlineNode : public LayoutBox
+{
+public:
+  InlineNode(std::shared_ptr<StyledNode> styledNode) : LayoutBox(BoxType::Inline, styledNode) {}
+};
+
+class AnonymousBlock : public LayoutBox
+{
+public:
+  AnonymousBlock() : LayoutBox(BoxType::AnonymousBlock) {}
+
+  void layout(const Dimensions &containingBlock) override;
+};
+
+class LayoutBoxBuilder
+{
+  std::shared_ptr<LayoutBox> buildLayoutTree(std::shared_ptr<StyledNode> styledNode);
+  std::shared_ptr<LayoutBox> newLayoutBoxRoot(std::shared_ptr<StyledNode> styledNode);
+
+public:
+  std::shared_ptr<LayoutBox> buildLayoutBox(std::shared_ptr<StyledNode> styledNode, Dimensions &containingBlock);
 };
