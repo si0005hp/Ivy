@@ -5,11 +5,7 @@
 
 TEST(style_test, minimal)
 {
-  std::shared_ptr<Node> htmlNode = parseHtml("html/minimal.html");
-  std::shared_ptr<Stylesheet> stylesheet = parseCSS("css/minimal.css");
-
-  StyledNodeBuilder styledNodeBuilder;
-  std::shared_ptr<StyledNode> root = styledNodeBuilder.buildStyledNode(htmlNode, stylesheet);
+  std::shared_ptr<StyledNode> root = buildStyledNode("html/minimal.html", "css/minimal.css");
 
   ASSERT_EQ(std::static_pointer_cast<ElementNode>(root->getNode())->getTagName(), "html");
   ASSERT_EQ(root->getChildren().size(), 0);
@@ -19,11 +15,7 @@ TEST(style_test, minimal)
 
 TEST(style_test, basic)
 {
-  std::shared_ptr<Node> htmlNode = parseHtml("html/attributes2.html");
-  std::shared_ptr<Stylesheet> stylesheet = parseCSS("css/selectors.css");
-
-  StyledNodeBuilder styledNodeBuilder;
-  std::shared_ptr<StyledNode> root = styledNodeBuilder.buildStyledNode(htmlNode, stylesheet);
+  std::shared_ptr<StyledNode> root = buildStyledNode("html/attributes2.html", "css/selectors.css");
 
   ASSERT_EQ(root->getSpecifiedValues().size(), 0);
   ASSERT_EQ(root->getChildren().size(), 2);
@@ -54,11 +46,7 @@ TEST(style_test, basic)
 
 TEST(style_test, specificity)
 {
-  std::shared_ptr<Node> htmlNode = parseHtml("html/attributes3.html");
-  std::shared_ptr<Stylesheet> stylesheet = parseCSS("css/selectors.css");
-
-  StyledNodeBuilder styledNodeBuilder;
-  std::shared_ptr<StyledNode> root = styledNodeBuilder.buildStyledNode(htmlNode, stylesheet);
+  std::shared_ptr<StyledNode> root = buildStyledNode("html/attributes3.html", "css/selectors.css");
 
   ASSERT_EQ(root->getSpecifiedValues().size(), 1);
   auto color = std::static_pointer_cast<Color>(root->getSpecifiedValues()["border-color"]);

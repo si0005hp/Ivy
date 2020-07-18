@@ -17,8 +17,7 @@ std::shared_ptr<ElementNode> parseHtml(std::string file)
   HTMLParser *htmlParser = generateAntlr4Parser<HTMLLexer, HTMLParser>(testResource(file));
   HTMLParser::HtmlDocumentContext *html = htmlParser->htmlDocument();
 
-  IvyHTMLParser ivyHtmlParser;
-  return ivyHtmlParser.parseHtml(html);
+  return IvyHTMLParser().parseHtml(html);
 }
 
 std::shared_ptr<Stylesheet> parseCSS(std::string file)
@@ -26,6 +25,13 @@ std::shared_ptr<Stylesheet> parseCSS(std::string file)
   CSSParser *cssParser = generateAntlr4Parser<CSSLexer, CSSParser>(testResource(file));
   CSSParser::StylesheetContext *css = cssParser->stylesheet();
 
-  IvyCSSParser ivyCSSParser;
-  return ivyCSSParser.parseCSS(css);
+  return IvyCSSParser().parseCSS(css);
+}
+
+std::shared_ptr<StyledNode> buildStyledNode(std::string htmlFilePath, std::string cssFilePath)
+{
+  std::shared_ptr<Node> htmlNode = parseHtml(htmlFilePath);
+  std::shared_ptr<Stylesheet> stylesheet = parseCSS(cssFilePath);
+
+  return StyledNodeBuilder().buildStyledNode(parseHtml(htmlFilePath), parseCSS(cssFilePath));
 }
